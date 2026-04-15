@@ -2,60 +2,47 @@ let jsPsych = initJsPsych();
 
 let timeline = [];
 
-//Welcome
 let welcomeTrial = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: `
-    <h1>Welcome to the Lexical Decision Task!</h1> 
-    <p>In this experiment, you will be shown a series of characters and asked to categorize whether the characters make up a word or not.</p>
-    <p>There are three parts to this experiment.</p>
-    <p class='instructions'>Press SPACE to begin the first part.</p>
+    <h1>Welcome to the Response Time Task!</h1> 
+    <p>In this experiment, you will see a blue or orange circle on the screen</p>
+    <p>If you see a blue circle, press the F key.</p>
+    <p>If you see a orange circle, press the J key.</p>
+    <p>Press SPACE to begin.</p>
     `,
     choices: [' '],
 };
+
 timeline.push(welcomeTrial);
 
-
-// Shuffle the conditions
-for (let block of conditions) {
-
-    let blockConditions = jsPsych.randomization.repeat(block.conditions, 1);
-
-    let blockIntroTrial = {
+for (let condition of conditions) {
+    let conditionTrial = {
         type: jsPsychHtmlKeyboardResponse,
-        stimulus: `
-            <h1>${block.title}</h1>
-            <p>You are about to see a series of ${block.count} characters.</p>
-            <p>If the characters make up a word, press the F key.</p>
-            <p>If the characters do not make up a word, press the J key.</p>
-            <p>Press SPACE to begin.</p>
-            `,
-        choices: [' '],
-    };
-    timeline.push(blockIntroTrial);
-
-    for (let condition of blockConditions) {
-        let conditionTrial = {
-            type: jsPsychHtmlKeyboardResponse,
-            stimulus: `<h1>${condition.characters}</h1>`,
-            choices: ['f', 'j'],
-            data: {
-                collect: true,
-                characters: condition.characters,
-                blockId: block.title,
-            },
-            on_finish: function (data) {
-                if (data.response == 'f' && condition.isWord == true) {
-                    data.correct = true;
-                } else if (data.response == 'j' && condition.isWord == false) {
-                    data.correct = true;
-                } else {
-                    data.correct = false;
-                }
+        stimulus: `<img src='images/${condition}-circle.png'>`,
+        choices: ['f', 'j'],
+        data: {
+            collect: true
+        },
+        on_finish: function (data) {
+            if ((data.response == 'f' && condition == 'blue') || (data.response == 'j' && condition == 'orange')) {
+                data.correct = true;
+            } else {
+                data.correct = false;
             }
+
+            console.log(data.response);
         }
-        timeline.push(conditionTrial);
     }
+    timeline.push(conditionTrial);
+
+    let fixationTrial = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `+`,
+        trial_duration: 500,
+        choices: ['NO KEY']
+    }
+    timeline.push(fixationTrial);
 }
 
 let resultsTrial = {
@@ -68,7 +55,7 @@ let resultsTrial = {
         `,
     on_start: function () {
         //  ⭐ Update the following three values as appropriate ⭐
-        let prefix = 'lexical-decision';
+        let prefix = 'response-time';
         let dataPipeExperimentId = 'your-experiment-id-here';
         let forceOSFSave = false;
 
@@ -111,15 +98,14 @@ let resultsTrial = {
 timeline.push(resultsTrial);
 
 
-//Debrief
 let debriefTrial = {
     type: jsPsychHtmlKeyboardResponse,
     stimulus: `
-    <h1>Thank you for your participation!</h1>
-    <p>You can now close the tab</p>
-    `,
-    choices: ['NO KEYS']
+    <h1>Thank your for your participation!</h1>
+    <p>You can now close this tab</p>`,
+    choices: ['NO KEY']
 }
 
 timeline.push(debriefTrial);
+
 jsPsych.run(timeline);
