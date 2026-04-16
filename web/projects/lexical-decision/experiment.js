@@ -9,7 +9,7 @@ let welcomeTrial = {
     <h1>Welcome to the Lexical Decision Task!</h1> 
     <p>In this experiment, you will be shown a series of characters and asked to categorize whether the characters make up a word or not.</p>
     <p>There are three parts to this experiment.</p>
-    <p class='instructions'>Press SPACE to begin the first part.</p>
+    <p class='instructions'>Press <span class= 'key'>SPACE</span> to begin the first part.</p>
     `,
     choices: [' '],
 };
@@ -64,6 +64,7 @@ let resultsTrial = {
     async: false,
     stimulus: `
         <h1>Please wait...</h1>
+        <span class='loader'></span>
         <p>We are saving the results of your inputs.</p>
         `,
     on_start: function () {
